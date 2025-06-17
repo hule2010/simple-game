@@ -3,94 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小游戏列表</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google Sign-In API -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>小游戏中心</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #7b5cff 0%, #4e8cff 100%);
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            color: #222;
+            margin: 0;
+        }
+        .header {
+            color: #fff;
+            text-align: center;
+            padding: 48px 0 20px 0;
+        }
+        .header-title {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .header-desc {
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.92;
+        }
+        .google-login {
+            position: absolute;
+            top: 32px;
+            right: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .search-container {
+            margin: 0 auto 24px auto;
+            max-width: 700px;
+        }
+        .search-bar {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(80,80,160,0.08);
+            padding: 16px 24px;
+            margin-bottom: 16px;
+        }
+        .search-input {
+            width: 100%;
+            border: none;
+            font-size: 1.1rem;
+            outline: none;
+            background: transparent;
+        }
+        .category-filter {
+            background: none;
+            box-shadow: none;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+        }
+        .category-btn {
+            background: #f3f4fa;
+            color: #7b5cff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .category-btn.active, .category-btn:hover {
+            background: linear-gradient(90deg, #7b5cff 0%, #4e8cff 100%);
+            color: #fff;
+        }
+        .games-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: center;
+        }
+        .game-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 4px 32px rgba(80,80,160,0.10);
+            width: 320px;
+            padding: 32px 24px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            transition: box-shadow 0.2s;
+        }
+        .game-card:hover {
+            box-shadow: 0 8px 40px rgba(80,80,160,0.18);
+        }
+        .game-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 18px;
+            display: block;
+        }
+        .game-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .game-description {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 18px;
+            text-align: center;
+            min-height: 44px;
+        }
+        .game-meta {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.98rem;
+            color: #888;
+            margin-bottom: 18px;
+        }
+        .play-btn {
+            background: linear-gradient(90deg, #7b5cff 0%, #4e8cff 100%);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 12px 0;
+            width: 100%;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: auto;
+            transition: box-shadow 0.2s, background 0.2s;
+            box-shadow: 0 2px 8px rgba(80,80,160,0.10);
+        }
+        .play-btn:hover {
+            background: linear-gradient(90deg, #4e8cff 0%, #7b5cff 100%);
+            box-shadow: 0 4px 16px rgba(80,80,160,0.16);
+        }
+        @media (max-width: 900px) {
+            .games-grid { gap: 20px; }
+            .game-card { width: 95vw; max-width: 340px; }
+        }
+        @media (max-width: 600px) {
+            .header-title { font-size: 1.5rem; }
+            .container { padding: 0 4px; }
+            .game-card { padding: 20px 8px 16px 8px; }
+        }
+    </style>
 </head>
 <body>
+    <div class="header">
+        <div class="header-title">
+            <span style="font-size:2.2rem;">🎮</span> 小游戏中心
+        </div>
+        <div class="header-desc">发现有趣的小游戏，享受休闲时光</div>
+        <div class="google-login">
+            <div id="g_id_onload"
+                data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-size="large"
+                data-theme="outline"
+                data-text="sign_in_with"
+                data-shape="rectangular"
+                data-logo_alignment="left">
+            </div>
+            <select id="lang-switch" style="margin-left:16px;padding:6px 16px;border-radius:8px;font-size:1rem;outline:none;border:1px solid #e0e0e0;vertical-align:middle;">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </div>
     <div class="container">
-        <header class="header">
-            <div class="header-content">
-                <div class="header-text">
-                    <h1 class="title">🎮 小游戏中心</h1>
-                    <p class="subtitle">发现有趣的小游戏，享受休闲时光</p>
-                </div>
-                <div class="user-section">
-                    <div id="user-info" class="user-info" style="display: none;">
-                        <img id="user-avatar" class="user-avatar" src="" alt="用户头像">
-                        <span id="user-name" class="user-name"></span>
-                        <button id="logout-btn" class="logout-btn">退出登录</button>
-                    </div>
-                    <div id="login-section" class="login-section">
-                        <div id="g_id_onload"
-                             data-client_id="YOUR_GOOGLE_CLIENT_ID"
-                             data-callback="handleCredentialResponse"
-                             data-auto_prompt="false">
-                        </div>
-                        <div class="g_id_signin" 
-                             data-type="standard"
-                             data-size="large"
-                             data-theme="outline"
-                             data-text="sign_in_with"
-                             data-shape="rectangular"
-                             data-logo_alignment="left">
-                        </div>
-                    </div>
-                </div>
+        <div class="search-container">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="试试'太空射击'" />
             </div>
-        </header>
-
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="搜索游戏..." class="search-input">
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-category="all">全部</button>
-                <button class="filter-btn" data-category="puzzle">益智</button>
-                <button class="filter-btn" data-category="action">动作</button>
-                <button class="filter-btn" data-category="casual">休闲</button>
-                <button class="filter-btn" data-category="strategy">策略</button>
-            </div>
+            <div class="category-filter" id="categoryFilter"></div>
         </div>
-
         <div class="games-grid" id="gamesGrid">
-            <!-- 游戏卡片将通过JavaScript动态生成 -->
-        </div>
-
-        <div class="loading" id="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>加载中...</p>
+            <!-- 游戏卡片将通过JS动态生成 -->
         </div>
     </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        // 游戏名称到图标文件名的模糊匹配
+        function getIconByTitle(title) {
+            title = title.toLowerCase();
+            if (title.includes('方块') || title.includes('puzzle')) return 'icons/puzzle.svg';
+            if (title.includes('蛇') || title.includes('snake')) return 'icons/snake.svg';
+            if (title.includes('太空') || title.includes('射击') || title.includes('rocket') || title.includes('space')) return 'icons/rocket.svg';
+            if (title.includes('棋')) return 'icons/chess-knight.svg';
+            if (title.includes('篮球')) return 'icons/basketball-ball.svg';
+            if (title.includes('街机')) return 'icons/joystick.svg';
+            if (title.includes('农场')) return 'icons/farm-tractor.svg';
+            return 'icons/puzzle.svg'; // 默认
+        }
 
-    <!-- 登录模态框 -->
-    <div id="loginModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🎮 需要登录才能开始游戏</h2>
-                <span class="close" id="closeModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>为了提供更好的游戏体验和保存您的游戏进度，请先登录Google账户。</p>
-                <div class="modal-login-section">
-                    <div id="modal-g_id_onload"
-                         data-client_id="YOUR_GOOGLE_CLIENT_ID"
-                         data-callback="handleCredentialResponse"
-                         data-auto_prompt="false">
+        // 渲染游戏卡片
+        function createGameCard(game) {
+            const iconUrl = getIconByTitle(game.title);
+            return `
+                <div class="game-card">
+                    <img class="game-icon" src="${iconUrl}" alt="${game.title}">
+                    <h3 class="game-title">${game.title}</h3>
+                    <p class="game-description">${game.description}</p>
+                    <div class="game-meta">
+                        <span>${game.category}</span>
+                        <span>⭐ ${game.rating}</span>
                     </div>
-                    <div class="g_id_signin modal-signin" 
-                         data-type="standard"
-                         data-size="large"
-                         data-theme="filled_blue"
-                         data-text="sign_in_with"
-                         data-shape="rectangular"
-                         data-logo_alignment="left">
-                    </div>
+                    <button class="play-btn">🎮 开始游戏</button>
                 </div>
-            </div>
-        </div>
-    </div>
+            `;
+        }
 
-    <script src="script.js"></script>
+        // 加载游戏数据
+        async function loadGames(category = 'all', search = '') {
+            const lang = localStorage.getItem('language') || (navigator.language.startsWith('zh') ? 'zh' : 'en');
+            const gamesGrid = document.getElementById('gamesGrid');
+            gamesGrid.innerHTML = '<div style="color:#fff;">加载中...</div>';
+            try {
+                const res = await fetch(`/api/games?category=${category}&search=${search}&language=${lang}`);
+                const games = await res.json();
+                if (!games.length) {
+                    gamesGrid.innerHTML = '<div style="color:#fff;">没有找到相关游戏</div>';
+                    return;
+                }
+                gamesGrid.innerHTML = games.map(createGameCard).join('');
+            } catch (e) {
+                gamesGrid.innerHTML = '<div style="color:#fff;">加载失败</div>';
+            }
+        }
+
+        // 搜索和筛选逻辑
+        let currentCategory = 'all';
+        let searchTimeout;
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadGames(currentCategory, e.target.value);
+            }, 300);
+        });
+
+        // 分类中英文映射（只用英文key，label为对象）
+        const categories = [
+            { key: 'all', label: { zh: '全部', en: 'All' } },
+            { key: 'Puzzle', label: { zh: '益智', en: 'Puzzle' } },
+            { key: 'Action', label: { zh: '动作', en: 'Action' } },
+            { key: 'Casual', label: { zh: '休闲', en: 'Casual' } },
+            { key: 'Strategy', label: { zh: '策略', en: 'Strategy' } }
+        ];
+
+        // 渲染分类按钮
+        function renderCategoryButtons(lang, currentKey = 'all') {
+            const filter = document.getElementById('categoryFilter');
+            filter.innerHTML = '';
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn' + (cat.key === currentKey ? ' active' : '');
+                btn.setAttribute('data-category', cat.key);
+                btn.textContent = cat.label[lang];
+                btn.onclick = function() {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = cat.key;
+                    loadGames(currentCategory, document.querySelector('.search-input').value);
+                };
+                filter.appendChild(btn);
+            });
+        }
+
+        // Google 登录回调
+        function handleCredentialResponse(response) {
+            // 这里可以处理登录后的逻辑
+            console.log("Google 登录成功: ", response.credential);
+        }
+
+        // 语言切换逻辑
+        function setLang(lang) {
+            localStorage.setItem('language', lang);
+            renderCategoryButtons(lang, currentCategory);
+            window.location.reload();
+        }
+
+        // 初始化语言下拉框
+        document.addEventListener('DOMContentLoaded', () => {
+            const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+            const lang = localStorage.getItem('language') || (browserLang.startsWith('zh') ? 'zh' : 'en');
+            document.getElementById('lang-switch').value = lang;
+            document.getElementById('lang-switch').addEventListener('change', function() {
+                setLang(this.value);
+            });
+            renderCategoryButtons(lang, currentCategory);
+            loadGames();
+        });
+    </script>
 </body>
 </html>
